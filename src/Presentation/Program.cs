@@ -14,6 +14,7 @@ namespace Presentation
             await WorkWithUserJson( id,service);
             var servicePost = new PostJsonService();
             await WorkWithPostsJson(servicePost);
+            await WorkWithPostAsync(id,servicePost);
         }
         public static  async Task WorkWithUsersJson(IUserJsonService service,CancellationToken ct = default)
         {
@@ -34,6 +35,15 @@ namespace Presentation
         {
             var result = await service.GetAllAsync(ct);
             DispalyEntities(result);
+        }
+        public static async Task WorkWithPostAsync(int id, IPostJsonService service, CancellationToken ct = default)
+        {
+            if (id < 0)
+            {
+                throw new ArgumentException("Id can not be negative");
+            }
+            var post = await service.GetByIdAsync(id, ct);
+            Console.WriteLine(post);
         }
         private static void DispalyEntities<T>(IReadOnlyCollection<T> entity) where T : class => entity.ToList().ForEach(t => Console.WriteLine(t));
 
