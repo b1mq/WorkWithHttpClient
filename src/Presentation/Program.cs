@@ -12,6 +12,8 @@ namespace Presentation
             await WorkWithUsersJson(service);
             int id = 5;
             await WorkWithUserJson( id,service);
+            var servicePost = new PostJsonService();
+            await WorkWithPostsJson(servicePost);
         }
         public static  async Task WorkWithUsersJson(IUserJsonService service,CancellationToken ct = default)
         {
@@ -27,6 +29,11 @@ namespace Presentation
             }
             var user = await service.GetByIdAsync(id, ct);
             Console.WriteLine(user);
+        }
+        public static async Task WorkWithPostsJson(IPostJsonService service,CancellationToken ct = default)
+        {
+            var result = await service.GetAllAsync(ct);
+            DispalyEntities(result);
         }
         private static void DispalyEntities<T>(IReadOnlyCollection<T> entity) where T : class => entity.ToList().ForEach(t => Console.WriteLine(t));
 

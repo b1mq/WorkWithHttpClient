@@ -11,15 +11,12 @@ using Domain.Entities;
 
 namespace Application.Services
 {
-    internal class UserParser:IUserParser
+    internal sealed  class UserParser:IUserParser
     {
-        private static readonly JsonSerializerOptions Options = new()
+       
+        public  async Task<IReadOnlyCollection<User>> ParseUsersAsync(Stream rawUsers,CancellationToken ct)
         {
-            PropertyNameCaseInsensitive = true
-        };
-        public async Task<IReadOnlyCollection<User>> ParseUsersAsync(Stream rawUsers,CancellationToken ct)
-        {
-            var dtos = await JsonSerializer.DeserializeAsync<IReadOnlyCollection<UserDto>>(rawUsers, Options, ct);
+            var dtos = await JsonSerializer.DeserializeAsync<IReadOnlyCollection<UserDto>>(rawUsers, ParserOptions.Options, ct);
             if (dtos is null || dtos.Count == 0)
                 return Array.Empty<User>();
             var users = new List<User>(dtos.Count);
@@ -36,9 +33,9 @@ namespace Application.Services
             }
             return users;
         }
-        public async Task <User> ParseUserAsync(Stream rawUsers,CancellationToken ct)
+        public  async Task <User> ParseUserAsync(Stream rawUsers,CancellationToken ct)
         {
-            var userDto = await JsonSerializer.DeserializeAsync<UserDto>(rawUsers, Options, ct);
+            var userDto = await JsonSerializer.DeserializeAsync<UserDto>(rawUsers, ParserOptions.Options, ct);
             if(userDto is null) throw new ArgumentNullException(nameof(userDto));
             var addressDto = userDto?.AddressDto;
             var address = new AdressBuilder().FromDto(addressDto).Build();
