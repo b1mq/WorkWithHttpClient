@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using Application.Builders;
@@ -34,6 +35,15 @@ namespace Application.Services
                 }
             }
             return users;
+        }
+        public async Task <User> ParseUserAsync(Stream rawUsers,CancellationToken ct)
+        {
+            var userDto = await JsonSerializer.DeserializeAsync<UserDto>(rawUsers, Options, ct);
+            if(userDto is null) throw new ArgumentNullException(nameof(userDto));
+            var addressDto = userDto?.AddressDto;
+            var address = new AdressBuilder().FromDto(addressDto).Build();
+            var user = User.Create(userDto.Id, userDto.Name, userDto.Username, userDto.Email, address, userDto.Phone, userDto.Company);
+            return user;
         }
 
     }

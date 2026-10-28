@@ -34,7 +34,8 @@ namespace Application.Services
         }
         public async Task<User?> GetByIdAsync(int id,CancellationToken ct)
         {
-            return await _client.GetFromJsonAsync<User>($"users/{id}", ct);
+            await using var stream = await _client.GetStreamAsync($"users/{id}",ct);
+            return await _parser.ParseUserAsync(stream, ct);
         }
     }
 }
